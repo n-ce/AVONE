@@ -55,7 +55,7 @@
             const finder = itag => formats.find(format => format.itag === itag)?.url;
             const fs = formats.map(format => format.itag + ' ' + format.encoding.substring(4)).join('\n');
             if (!confirm(fs)) return;
-            const vitag = prompt('Enter Video Itag'));
+            const vitag = prompt('Enter Video Itag');
             const aitag = prompt('Enter Audio Itag');
             const videosrc = finder(vitag);
             const audiosrc = finder(aitag);
