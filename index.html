@@ -55,8 +55,11 @@
       .then(_ => _.json())
       .then(i => i.invidious[0])
       .then(i => {
-        const origin = new URL(url).origin;
-        const proxy = url => url.replace(origin, i) + '&host=' + origin.slice(8);
+        
+        function proxy(url) {
+          const origin = new URL(url).origin; 
+          return url.replace(origin, i) + '&host=' + origin.slice(8);
+        }
         
         fetch(i + '/api/v1/videos/' + id)
           .then(_ => _.json())
