@@ -34,58 +34,43 @@
   </video>
   <script>
     const id = location.search.slice(-11);
-    const query = '/api/v1/videos/' + id;
     const video = document.body.firstElementChild;
     const source = video.firstElementChild;
     const audio = video.lastElementChild;
 
-    function proxy(url: string) {
-      const proxy = 'https://pol1.iv.ggtyler.dev';
-      const cons = new URL(url);
-      const origin = cons.origin;
-      return url.replace(origin, proxy) + '&host=' + origin.slice(8);
-    }
-
-
     video.onplay = () => {
       audio.play();
     }
-
     video.onpause = () => {
       audio.pause();
     }
-
     video.ontimeupdate = () => {
       audio.currentTime = video.currentTime;
     }
-
-    video.onloadstart = () => console.log('loadstart')
-
     video.onloadeddata = () => {
       video.play();
     }
 
-
     fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
       .then(_ => _.json())
+      .then(i => i.invidious[0])
       .then(i => {
-
-        fetch(i.invidious[0] + query)
+        const origin = new URL(url).origin;
+        const proxy = url => url.replace(origin, i) + '&host=' + origin.slice(8);
+        
+        fetch(i + '/api/v1/videos/' + id)
           .then(_ => _.json())
-          .then(data => {
-
-            const videoStreams = data.adaptiveFormats.filter((f: any) => f.type.includes('av01'));
-            const audioStreams = data.adaptiveFormats.filter((f: any) => f.type.includes('opus'));
+          .then(_ => _.adaptiveFormats)
+          .then(f => {
+            const videos = f.filter(_ => _.type.includes('av01'));
+            const audios = f.filter(_ => _.type.includes('opus'));
 
             video.poster = `https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`;
 
-            source.src = proxy(videoStreams[0].url);
-            audio.src = proxy(audioStreams[0].url);
-
+            source.src = proxy(videos[0].url);
+            audio.src = proxy(audios[0].url);
           });
       });
-
-
   </script>
 </body>
 
