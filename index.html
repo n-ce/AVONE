@@ -51,8 +51,12 @@
           .then(response => response.json())
           .then(data => data.adaptiveFormats)
           .then(formats => {
-            const videosrc = formats.find(format => format.itag === prompt('Enter Video Itag'));
-            const audiosrc = formats.find(format => format.itag === prompt('Enter Audio Itag'));
+            const finder = itag => formats.find(format => format.itag === itag);
+            const av1check = finder(394);
+            const vitag = prompt('Enter Video Itag'+ av1check ? '':' (av1 is not available)');
+            const aitag = prompt('Enter Audio Itag');
+            const videosrc = finder(vitag);
+            const audiosrc = finder(aitag);
 
             if (!videosrc)
               alert('Video Itag Not Available');
