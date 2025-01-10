@@ -20,31 +20,21 @@
 
     video {
       margin: 1rem;
-      border-radius: 1rem;
+      border-radius: 0.5rem;
       width: 100vmin;
     }
   </style>
 </head>
 
 <body>
-  <video controls crossorigin="anonymous"></video>
-  <audio crossorigin="anonymous"></audio>
+  <video controls></video>
   <script>
     const video = document.body.firstElementChild;
-    const audio = video.nextElementSibling;
+    const audio = new Audio();
 
-    video.onplay = () => {
-      audio.play();
-    }
-    video.onpause = () => {
-      audio.pause();
-    }
-    video.ontimeupdate = () => {
-      audio.currentTime = video.currentTime;
-    }
-    video.onloadeddata = () => {
-      video.play();
-    }
+    video.onplay = () => audio.play();
+    video.onpause = () => audio.pause();
+    video.ontimeupdate = () => { audio.currentTime = video.currentTime; }
 
     fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
       .then(response => response.json())
@@ -55,18 +45,22 @@
           return url.replace(origin, instance) + '&host=' + origin.slice(8);
         }
         const id = location.search.slice(-11);
-
+        video.poster = `https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`;
+        
         fetch(instance + '/api/v1/videos/' + id)
           .then(response => response.json())
           .then(data => data.adaptiveFormats)
           .then(formats => {
-            const videos = formats.filter(format => format.type.includes('av01'));
-            const audios = formats.filter(format => format.type.includes('opus'));
+            const videosrc = formats.find(format => format.itag === prompt('Enter Video Itag'));
+            const audiosrc = formats.find(format => format.itag === prompt('Enter Audio Itag'));
 
-            video.poster = `https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`;
-
-            video.src = proxy(videos[0].url);
-            audio.src = proxy(audios[0].url);
+            if (!videosrc)
+              alert('Video Itag Not Available');
+            if (!audiosrc)
+              alert('Audio Itag Not Available');
+              
+            video.src = proxy(videosrc);
+            audio.src = proxy(audiosrc);
           });
       });
   </script>
