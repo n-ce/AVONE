@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AVONE</title>
+  <title>Avone</title>
   <style>
     :root {
       background-color: black;
@@ -28,9 +28,10 @@
 
 <body>
   <video controls></video>
+  <audio></audio>
   <script>
     const video = document.body.firstElementChild;
-    const audio = new Audio();
+    const audio = video.nextElementSibling;
 
     video.onplay = () => audio.play();
     video.onpause = () => audio.pause();
