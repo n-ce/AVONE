@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AVONE</title>
+  <style>
+    :root {
+      background-color: black;
+    }
+
+    body {
+      margin: 0;
+      display: flex;
+      place-items: center;
+      justify-content: center;
+      height: 100dvh;
+    }
+
+    video {
+      margin: 1rem;
+      border-radius: 1rem;
+      width: 100vmin;
+    }
+  </style>
+</head>
+
+<body>
+  <video controls crossorigin="anonymous">
+    <source type="video/mp4">
+    <audio type="audio/webm">
+      Your browser does not support the element.
+  </video>
+  <script>
+    const id = location.search.slice(-11);
+    const query = '/api/v1/videos/' + id;
+    const video = document.body.firstElementChild;
+    const source = video.firstElementChild;
+    const audio = video.lastElementChild;
+
+    function proxy(url: string) {
+      const proxy = 'https://pol1.iv.ggtyler.dev';
+      const cons = new URL(url);
+      const origin = cons.origin;
+      return url.replace(origin, proxy) + '&host=' + origin.slice(8);
+    }
+
+
+    video.onplay = () => {
+      audio.play();
+    }
+
+    video.onpause = () => {
+      audio.pause();
+    }
+
+    video.ontimeupdate = () => {
+      audio.currentTime = video.currentTime;
+    }
+
+    video.onloadstart = () => console.log('loadstart')
+
+    video.onloadeddata = () => {
+      video.play();
+    }
+
+
+    fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
+      .then(_ => _.json())
+      .then(i => {
+
+        fetch(i.invidious[0] + query)
+          .then(_ => _.json())
+          .then(data => {
+
+            const videoStreams = data.adaptiveFormats.filter((f: any) => f.type.includes('av01'));
+            const audioStreams = data.adaptiveFormats.filter((f: any) => f.type.includes('opus'));
+
+            video.poster = `https://i.ytimg.com/vi_webp/${id}/maxresdefault.webp`;
+
+            source.src = proxy(videoStreams[0].url);
+            audio.src = proxy(audioStreams[0].url);
+
+          });
+      });
+
+
+  </script>
+</body>
+
+</html>
