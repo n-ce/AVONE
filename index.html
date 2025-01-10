@@ -38,7 +38,7 @@
 
     fetch('https://raw.githubusercontent.com/n-ce/Uma/main/dynamic_instances.json')
       .then(response => response.json())
-      .then(data => data.invidious[0])
+      .then(data => data.invidious[1])
       .then(instance => {
         function proxy(url) {
           const origin = new URL(url).origin;
